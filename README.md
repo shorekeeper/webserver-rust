@@ -28,7 +28,7 @@ This code uses the following dependencies:
 - `lettre`: for sending emails via SMTP
 - `tera`: for rendering templates
 
-## Usage
+## Code usage
 
 1. Set the SMTP server credentials by replacing the values of the `SMTP_SERVER`, `SMTP_USER`, and `SMTP_PASS` static variables with your own SMTP server information.
 2. The `process_form` function takes in a `web::Form` object containing form data as a key-value pair and returns an `HttpResponse`.
