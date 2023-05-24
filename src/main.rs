@@ -28,7 +28,10 @@ async fn index() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Trying to run on: {}", SERVER_IP); // output server ip
+    // \x1b[32m - green
+    // \x1b[31m - blue 
+    // \x1b[0m - reset
+    println!("[INFO] \x1b[33mTrying to run on: \x1b[31m{}\x1b[0m", SERVER_IP); // output server ip
     // start the HTTP server
     let server = match HttpServer::new(|| {
         App::new()
@@ -40,8 +43,8 @@ async fn main() -> std::io::Result<()> {
         // if ok
         Ok(server) => {
             // print the server IP address after the server starts
-            println!("Listening on: {}", SERVER_IP);
-            println!("Ok bro now i'm gonna run ur site");
+            println!("[INFO] 📢 \x1b[32mListening on: \x1b[31m{}\x1b[0m", SERVER_IP);
+            println!("[INFO] Ok bro now i'm gonna run ur site");
             server
         }
         // if NOT ok
