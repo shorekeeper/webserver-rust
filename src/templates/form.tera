@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ context }}</title>
+    </head>
+    <body>
+        <h1>{{ context }}</h1>
+        <p>Thank you for your submission, {{ name }}!</p>
+        <p>We will respond to your message at {{ email }} as soon as possible.</p>
+        <p>Your message:</p>
+        <p>{{ message }}</p>
+    </body>
+</html>
