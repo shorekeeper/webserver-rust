@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.3.1"
+lettre = "0.10.4"
+lettre_email = "0.9.4"
 tera = "1.11.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
