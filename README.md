@@ -34,7 +34,7 @@ This code uses the following dependencies:
 ```rust
 static SMTP_USER: &str = "your_smtp_user";
 static SMTP_PASS: &str = "your_smtp_pass";
-static SMTP_HOST: &str = "your_smtp_host" // WITHOUT SSL:// OR TLS://!!! ;
+static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
 ```
 2. The `process_form` function takes in a `web::Form` object containing form data as a key-value pair and returns an `HttpResponse`.
 3. The function checks if the form data is empty and inserts an error message into the Tera context if it is.
