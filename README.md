@@ -14,8 +14,8 @@ This is a simple example of a Rust web application built using the Actix-Web fra
 ## Endpoints and code overview
 
 - The `main()` (EP: `/` )  function sets up the Actix-Web server and defines the two routes.
-- The `index()` (EP: `/templates/index` ) function handles requests to the root URL and renders the `index.tera` template using the Tera templating engine.
-- The `form()` (EP: `/templates/form` ) function handles form submissions and renders the `form.tera` template with the submitted data.
+- The `index()` (EP: `/templates/index -> /index` ) function handles requests to the root URL and renders the `index.tera` template using the Tera templating engine.
+- The `form()` (EP: `/templates/form -> /form` ) function handles form submissions and renders the `form.tera` template with the submitted data.
 
 # Form Processing
 
