@@ -6,7 +6,7 @@ use tera::{Context, Tera};
 // defining SMTP server credentials as static variables
 static SMTP_USER: &str = "your_smtp_user";
 static SMTP_PASS: &str = "your_smtp_pass";
-static SMTP_HOST: &str = "your_smtp_host" // WITHOUT SSL:// OR TLS://!!! ;
+static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
 
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
     // create a new Tera context
