@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Rust Actix-Web Example
 
 This is a simple example of a Rust web application built using the Actix-Web framework. The application consists of two routes: an index page and a form submission page.
@@ -102,4 +102,3 @@ static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
 ## Credits
 
 This code is based on the [Actix-Web Getting Started](https://actix.rs/docs/getting-started/) guide and uses the [Tera](https://tera.netlify.app/) templating engine.
->>>>>>> 2f8824570b68b06cd0bf1f4d084998545148498d
