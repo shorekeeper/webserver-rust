@@ -18,6 +18,9 @@ async fn index() -> HttpResponse {
     // note: i would probably use a define here like static INDEX_PATH but then macros include_str!
     // should be replaced with "std::fs::read_to_string" which makes code runtime a bit so its bullshit
     // render the template with the context
+    // render the template with the context
+    // note: i would probably use a define here like static INDEX_PATH but then macros include_str!
+    // should be replaced with "std::fs::read_to_string" which makes code runtime a bit so its bullshit
     let body = Tera::one_off(include_str!("templates/index.tera"), &context, false)
         .expect("Failed to render template"); // handling error with except macros
     // return the rendered template as the response body
