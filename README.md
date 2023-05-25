@@ -1,4 +1,3 @@
-
 # Rust Actix-Web Example
 
 This is a simple example of a Rust web application built using the Actix-Web framework. The application consists of two routes: an index page and a form submission page.
