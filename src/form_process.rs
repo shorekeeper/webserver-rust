@@ -11,11 +11,6 @@ static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
     // create a new Tera context
     let mut context = Context::new();
-    // seeting up default "name" again otherwise we have panic:
-    // thread 'actix-rt|system:0|arbiter:1' panicked at 'called `Result::unwrap()` on an `Err` 
-    // value: Error { kind: Msg("Failed to render '__tera_one_off'"), source: 
-    // Some(Error { kind: Msg("Variable `name` not found in context while rendering '__tera_one_off'"), source: None }) }', 
-    // src/form_process.rs:84:84
     context.insert("name", "User");
     context.insert("context", "Rust Form");
 
@@ -25,42 +20,21 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
     
     // iterate over the form data
     for (key, value) in form.into_inner() {
-        // iterate over the form data
-        // check if the value is empty
         match value.is_empty() {
             true => {
-                // insert an error message into the context
                 context.insert("error", &format!("{} cannot be empty", key));
-                // print debug message for user mistake
                 match (name.is_empty(), email.is_empty(), message_body.is_empty()) {
-                    // so, THIS SHIT doens't work and can be a pretty good example of shitty code
                     (true, true, true) => {
                         context.insert("error", "smtp is not magic, type smth");
                         println!("[INFO] User is bruh");
                     },
-                    (true, _, _) => {
-                        context.insert("error", "Username is empty");
-                        println!("[WARN] User didn't enter a {}", key);
-                    },
-                    (_, true, _) => { 
-                        context.insert("error", "Email is empty");
-                        println!("[WARN] User didn't enter a {}", key);
-                    },
-                    (_, _, true) => { 
-                        context.insert("error", "Message body is empty");
-                        println!("[WARN] User didn't enter a {}", key);
-                    },
-                    (false, false, false) => (),
+                    _ => println!("[INFO] User didn't entered {}", key),
                 }
-                // skip to the next iteration
                 continue;
             }
             false => {
-                // insert the form data into the context
                 context.insert(key.as_str(), &value);
-                // print debug message for user actions
                 println!("[INFO] User entered {} for {}", value, key);
-                // extract email with name and message from the form data
                 match key.as_str() {
                     "email" => email = value,
                     "name" => name = value,

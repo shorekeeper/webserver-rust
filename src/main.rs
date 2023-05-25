@@ -14,10 +14,9 @@ async fn index() -> HttpResponse {
     // insert data into the context
     context.insert("context", "Rust Index");
     context.insert("name", "User");
-    // render the template with the context
+
     // note: i would probably use a define here like static INDEX_PATH but then macros include_str!
     // should be replaced with "std::fs::read_to_string" which makes code runtime a bit so its bullshit
-
     // render the template with the context
     let body = Tera::one_off(include_str!("templates/index.tera"), &context, false)
         .expect("Failed to render template"); // handling error with except macros
@@ -28,9 +27,6 @@ async fn index() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // \x1b[32m - green
-    // \x1b[31m - blue 
-    // \x1b[0m - reset
     println!("[INFO] \x1b[33mTrying to run on: \x1b[31m{}\x1b[0m", SERVER_IP); // output server ip
     // start the HTTP server
     let server = match HttpServer::new(|| {
@@ -43,14 +39,19 @@ async fn main() -> std::io::Result<()> {
         // if ok
         Ok(server) => {
             // print the server IP address after the server starts
-            println!("[INFO] 📢 \x1b[32mListening on: \x1b[31m{}\x1b[0m", SERVER_IP);
-            println!("[INFO] Ok bro now i'm gonna run ur site");
+            println!("[INFO] 📢 \x1B[1m\x1b[32mListening on: \x1b[31m{}\x1b[0m", SERVER_IP);
+            println!("[INFO] \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
+                // \x1b[32m - green
+                // \x1b[31m - red
+                // \x1B[4m - underline 
+                // \x1B[1m - bold
+                // \x1b[0m - reset
             server
         }
         // if NOT ok
         Err(e) => {
             // print the error
-            eprintln!("Failed to bind server to {}: {}", SERVER_IP, e);
+            eprintln!("\x1b[31m\x1b[1mFailed to bind server to \x1B[4m{}:\x1b[33m{}\x1b[0m", SERVER_IP, e);
             return Err(e);
         }
     };
