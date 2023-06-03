@@ -12,9 +12,9 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
     context.insert("context", "Rust Form");
 
     // defining SMTP server credentials as static variables
-    let SMTP_USER = env::var("SMTP_USER").expect("[ERROR] SMTP_USER must be set"); // get the SMTP_USER from the .env file
-    let SMTP_PASS = env::var("SMTP_PASS").expect("[ERROR] SMTP_PASS must be set"); // get the SMTP_PASS from the .env file
-    let SMTP_HOST = env::var("SMTP_HOST").expect("[ERROR] SMTP_HOST must be set"); // get the SMTP_HOST from the .env file | WITHOUT SSL:// OR TLS://!!!
+    let SMTP_USER = env::var("SMTP_USER").expect("SMTP_USER must be set"); // get the SMTP_USER from the .env file
+    let SMTP_PASS = env::var("SMTP_PASS").expect("SMTP_PASS must be set"); // get the SMTP_PASS from the .env file
+    let SMTP_HOST = env::var("SMTP_HOST").expect("SMTP_HOST must be set"); // get the SMTP_HOST from the .env file | WITHOUT SSL:// OR TLS://!!!
 
     let mut email = String::new();
     let mut name = String::new();
@@ -27,15 +27,15 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
                 match (name.is_empty(), email.is_empty(), message_body.is_empty()) {
                     (true, true, true) => {
                         context.insert("error", "smtp is not magic, type smth");
-                        println!("[INFO] User is bruh");
+                        println!("User is bruh");
                     },
-                    _ => println!("[INFO] User didn't entered {}", key),
+                    _ => println!("User didn't entered {}", key),
                 }
                 continue;
             }
             false => {
                 context.insert(key.as_str(), &value);
-                println!("[INFO] User entered {} for {}", value, key);
+                println!("User entered {} for {}", value, key);
                 match key.as_str() {
                     "email" => email = value,
                     "name" => name = value,
@@ -71,8 +71,8 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
 
             // send the email message
             match mailer.send(&message) {
-                Ok(_) => println!("[INFO] Email sended: {}", email),
-                Err(e) => eprintln!("[ERROR] Error sending email: {:?}", e),
+                Ok(_) => println!("Email sended: {}", email),
+                Err(e) => eprintln!("Error sending email: {:?}", e),
             }
         }
     }

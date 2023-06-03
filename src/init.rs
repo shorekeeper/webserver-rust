@@ -31,12 +31,12 @@ pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
     
     .bind(server_ip) {
         Ok(server) => { // if ok
-            log_warn!(&now, "[INFO] 📢 \x1B[1m\x1b[32mListening on: \x1b[31mhttp://{}\x1b[0m", server_ip); // print the server IP address after the server starts
-            log_info!(&now, "[INFO] ✅ \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
+            log_warn!(&now, "📢 \x1B[1m\x1b[32mListening on: \x1b[31mhttp://{}\x1b[0m", server_ip); // print the server IP address after the server starts
+            log_info!(&now, "✅ \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
             server
         }
         Err(e) => { // if NOT ok
-            log_error!(&now, "\x1b[31m\x1b[1mFailed to bind server to \x1B[4m'{}': \x1b[33m{}\x1b[0m ", server_ip, e); // print the error
+            log_error!(&now, "Failed to bind server to \x1B[4m'{}': \x1b[33m{}\x1b[0m ", server_ip, e); // print the error
             return Err(e);
         }
     };
