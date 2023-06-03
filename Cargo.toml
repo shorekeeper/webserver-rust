@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.3.1"
+env_logger = "0.10.0"
+futures-util = "0.3.28"
 lettre = "0.10.4"
 lettre_email = "0.9.4"
 tera = "1.11.0"

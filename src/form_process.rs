@@ -9,8 +9,8 @@ static SMTP_PASS: &str = "your_smtp_pass";
 static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
 
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
-    // create a new Tera context
-    let mut context = Context::new();
+     
+    let mut context = Context::new(); // create a new Tera context
     context.insert("name", "User");
     context.insert("context", "Rust Form");
 
@@ -18,8 +18,8 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
     let mut name = String::new();
     let mut message_body = String::new();
     
-    // iterate over the form data
-    for (key, value) in form.into_inner() {
+    
+    for (key, value) in form.into_inner() { // iterate over the form data
         match value.is_empty() {
             true => {
                 context.insert("error", &format!("{} cannot be empty", key));
@@ -54,13 +54,11 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
         .credentials(credentials)
         .build();
 
-    // validate the email address and SMTP username
-    match (email.is_empty() || !email.contains('@'), SMTP_USER.is_empty() || !SMTP_USER.contains('@')) {
+    match (email.is_empty() || !email.contains('@'), SMTP_USER.is_empty() || !SMTP_USER.contains('@')) { // validate the email address and SMTP username
         (true, _) => context.insert("error", "Invalid email address"),
         (_, true) => context.insert("error", "Invalid SMTP username"),
         (false, false) => {
-            // create an email message
-            let message = Message::builder()
+            let message = Message::builder() // create an email message
                 .from(SMTP_USER.parse().unwrap())
                 .to(email.parse().unwrap())
                 .subject("Form Submission")
@@ -77,8 +75,6 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
             }
         }
     }
-    // render the template with the context
-    let body = Tera::one_off(include_str!("templates/form.tera"), &context, false).unwrap();
-    // return the rendered template as the response body
-    HttpResponse::Ok().body(body)
+    let body = Tera::one_off(include_str!("templates/form.tera"), &context, false).unwrap(); // render the template with the context
+    HttpResponse::Ok().body(body) // return the rendered template as the response body
 }
