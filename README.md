@@ -30,11 +30,12 @@ This code uses the following dependencies:
 
 ## Code usage
 
-1. Set the SMTP server credentials by replacing the values of the `SMTP_SERVER`, `SMTP_USER`, and `SMTP_PASS` static variables with your own SMTP server information.
-```rust
-static SMTP_USER: &str = "your_smtp_user";
-static SMTP_PASS: &str = "your_smtp_pass";
-static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
+1. Set the SMTP server and server credentials by replacing the values of the `SMTP_SERVER`, `SMTP_USER`, and `SMTP_PASS`, `SERVER_IP` static variables with your own (host should not include ssl:// or tls://):
+```env
+SERVER_IP=127.0.0.1:8080
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_pass
+SMTP_HOST=your_smtp_host
 ```
 2. The `process_form` function takes in a `web::Form` object containing form data as a key-value pair and returns an `HttpResponse`.
 3. The function checks if the form data is empty and inserts an error message into the Tera context if it is.
