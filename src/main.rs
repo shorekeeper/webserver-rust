@@ -12,6 +12,7 @@ use crate::init::{create_server, init_logger};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    init_logger();
     check_config::check_config(); // call check_config function
     dotenv().ok(); // load the .env file
     
@@ -29,7 +30,6 @@ async fn main() -> std::io::Result<()> {
         Err(_) => "NO_IP_CONFIGURED".to_string(),
     };
 
-    init_logger();
     let _server = create_server(&server_ip).await?; // pass the server_ip to the create_server function
     Ok(())
 }

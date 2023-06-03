@@ -36,7 +36,7 @@ pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
             server
         }
         Err(e) => { // if NOT ok
-            log_error!(&now, "Failed to bind server to \x1B[4m'{}': \x1b[33m{}\x1b[0m ", server_ip, e); // print the error
+            log_error!(&now, "!!! FAILED TO BIND A SERVER !!!\n\x1b[33mIP: \x1b[31m'{}'\n\x1b[33m  |\n\x1b[33m  v\n\x1b[33mERROR_CODE: \x1b[31m{}\x1b[0m", server_ip, e);
             return Err(e);
         }
     };

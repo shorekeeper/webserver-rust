@@ -3,8 +3,8 @@ use std::path::Path;
 use std::thread;
 use std::time::Duration;
 
-use crate::{log_info}; // macro imports
-use crate::log::{info};
+use crate::log_info; // macro imports
+use crate::log::info;
 use crate::time::current_time;
 
 const DEFAULT_CONFIG: &str = 
@@ -43,7 +43,7 @@ pub fn check_config() {
             match updated {
                 true => {
                     fs::write(env_path, config).expect("Failed to update .env file");
-                    log_info!(&now, "Updated .env file with missing values. Please configure them before running the program again.");
+                    log_info!(&now, "\x1B[1m\x1b[32mUpdated .env file with missing values. Please configure them before running the program again.\x1B[0m");
                     thread::sleep(Duration::from_secs(10));
                     std::process::exit(0);
                 }

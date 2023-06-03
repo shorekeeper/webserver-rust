@@ -1,6 +1,5 @@
 use colored::Colorize;
 
-
 pub fn error(now: &str, message: &str) {
     eprintln!("{} {} {}", now.bold().dimmed(), "[ERROR]".bold().red(), message.red());
 }
