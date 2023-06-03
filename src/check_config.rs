@@ -9,6 +9,8 @@ use crate::time::current_time;
 
 const DEFAULT_CONFIG: &str = 
 r#"SERVER_IP=your_ip
+// !! LOCALHOST: 127.0.0.1:8080
+// !! IP SHOULD BE DECLARED IN FORMAT IP:PORT
 SMTP_USER=your_smtp_user
 SMTP_PASS=your_smtp_pass
 SMTP_HOST=your_smtp_host
