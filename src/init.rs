@@ -2,9 +2,9 @@ use actix_web::{web, App, HttpServer};
 use actix_web::middleware::{Logger, TrailingSlash::Trim};
 use env_logger::{Env, Builder};
 
-use crate::form_process;
 use crate::render_index::index;
-use crate::error_handler::{not_found}; // i'll add a json error handler later maybe
+use crate::form_process::process_form;
+use crate::error_handler::{not_found, handle_error};
 
 static SERVER_IP: &str = "127.0.0.1:8080"; // define the server IP address as a static variable
 
@@ -17,7 +17,8 @@ pub async fn create_server() -> std::io::Result<()> {
             .wrap(actix_web::middleware::Compress::default())
             .wrap(actix_web::middleware::NormalizePath::new(Trim))
             .route("/", web::get().to(index)) // register routes and their handlers
-            .route("/form", web::post().to(form_process::process_form))
+            .route("/form", web::post().to(process_form))
+            .app_data(web::Data::new(handle_error)) // register the error handler
             .default_service(
                 actix_web::web::route().to(not_found)
             ) // default gateway for bad request -> like 404

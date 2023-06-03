@@ -9,6 +9,7 @@ env_logger = "0.10.0"
 futures-util = "0.3.28"
 lettre = "0.10.4"
 lettre_email = "0.9.4"
+serde_json = "1.0.96"
 tera = "1.11.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
