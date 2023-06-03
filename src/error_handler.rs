@@ -5,19 +5,24 @@ use actix_web::{
     dev::ServiceRequest,
     http::StatusCode};
 
+use crate::{log_error}; // macro imports
+use crate::log::{error};
+use crate::time::current_time;
+
 pub async fn not_found() -> HttpResponse { // error handler for unregistered requests
     HttpResponse::NotFound().body("Sorry, the requested resource could not be found.")
 }
 
 pub fn handle_error(req: ServiceRequest, error: error::Error) -> actix_web::Result<HttpResponse> {
+    let now = current_time();
     let error_message = format!("{}", error);
     let method = req.method().to_string();
     let path = req.path().to_string();
     let headers = req.headers();
 
     // log information about the request
-    println!("Error occurred while processing request: {} {}", method, path);
-    println!("Headers: {:?}", headers);
+    log_error!(&now, "Error occurred while processing request: {} {}", method, path);
+    log_error!(&now, "Headers: {:?}", headers);
 
     let response = match error.as_response_error().error_response().status() {
         StatusCode::BAD_REQUEST => {

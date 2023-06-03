@@ -1,15 +1,18 @@
+mod error_handler;
 mod form_process;
 mod render_index;
+mod check_config;
 mod init;
-mod error_handler;
+mod time;
+mod log;
 // mod uploads;
-
 use dotenv::dotenv;
 use std::{env, str::FromStr, net::SocketAddr};
 use crate::init::{create_server, init_logger};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    check_config::check_config(); // call check_config function
     dotenv().ok(); // load the .env file
     
     let server_ip = match env::var("SERVER_IP") {

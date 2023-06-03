@@ -2,12 +2,16 @@ use actix_web::{web, App, HttpServer};
 use actix_web::middleware::{Logger, TrailingSlash::Trim};
 use env_logger::{Env, Builder};
 
+use crate::{log_info, log_warn, log_error}; // macro imports
+use crate::log::{info, error, warn};
+use crate::time::current_time;
 use crate::render_index::index;
 use crate::form_process::process_form;
 use crate::error_handler::{not_found, handle_error};
 
 pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
-    println!("[INFO] 🚀 \x1b[33mTrying to run on: \x1b[31m{}\x1b[0m", server_ip); // output server ip
+    let now = current_time();
+    log_info!(&now, "🚀 Trying to run on: \x1b[31m{}\x1b[0m", server_ip); // output server ip
     let server = match HttpServer::new(|| { // start the HTTP server
         App::new()  
             .wrap(Logger::default()) // logging
@@ -27,12 +31,12 @@ pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
     
     .bind(server_ip) {
         Ok(server) => { // if ok
-            println!("[INFO] 📢 \x1B[1m\x1b[32mListening on: \x1b[31mhttp://{}\x1b[0m", server_ip); // print the server IP address after the server starts
-            println!("[INFO] ✅ \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
+            log_warn!(&now, "[INFO] 📢 \x1B[1m\x1b[32mListening on: \x1b[31mhttp://{}\x1b[0m", server_ip); // print the server IP address after the server starts
+            log_info!(&now, "[INFO] ✅ \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
             server
         }
         Err(e) => { // if NOT ok
-            eprintln!("\x1b[31m\x1b[1mFailed to bind server to \x1B[4m'{}': \x1b[33m{}\x1b[0m ", server_ip, e); // print the error
+            log_error!(&now, "\x1b[31m\x1b[1mFailed to bind server to \x1B[4m'{}': \x1b[33m{}\x1b[0m ", server_ip, e); // print the error
             return Err(e);
         }
     };
