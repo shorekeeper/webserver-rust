@@ -1,3 +1,5 @@
+use std::thread;
+use std::time::Duration;
 use actix_web::{web, App, HttpServer};
 use actix_web::middleware::{Logger, TrailingSlash::Trim};
 use env_logger::{Env, Builder};
@@ -37,6 +39,7 @@ pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
         }
         Err(e) => { // if NOT ok
             log_error!(&now, "!!! FAILED TO BIND A SERVER !!!\n\x1b[33mIP: \x1b[31m'{}'\n\x1b[33m  |\n\x1b[33m  v\n\x1b[33mERROR_CODE: \x1b[31m{}\x1b[0m", server_ip, e);
+            thread::sleep(Duration::from_secs(10)); 
             return Err(e);
         }
     };
