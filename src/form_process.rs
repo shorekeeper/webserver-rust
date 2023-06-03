@@ -2,22 +2,23 @@ use actix_web::{web, HttpResponse};
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::authentication::Credentials;
 use tera::{Context, Tera};
+use std::env;
 
-// defining SMTP server credentials as static variables
-static SMTP_USER: &str = "your_smtp_user";
-static SMTP_PASS: &str = "your_smtp_pass";
-static SMTP_HOST: &str = "your_smtp_host"; // WITHOUT SSL:// OR TLS://!!!
-
+#[allow(non_snake_case)]
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
      
     let mut context = Context::new(); // create a new Tera context
     context.insert("name", "User");
     context.insert("context", "Rust Form");
 
+    // defining SMTP server credentials as static variables
+    let SMTP_USER = env::var("SMTP_USER").expect("[ERROR] SMTP_USER must be set"); // get the SMTP_USER from the .env file
+    let SMTP_PASS = env::var("SMTP_PASS").expect("[ERROR] SMTP_PASS must be set"); // get the SMTP_PASS from the .env file
+    let SMTP_HOST = env::var("SMTP_HOST").expect("[ERROR] SMTP_HOST must be set"); // get the SMTP_HOST from the .env file | WITHOUT SSL:// OR TLS://!!!
+
     let mut email = String::new();
     let mut name = String::new();
     let mut message_body = String::new();
-    
     
     for (key, value) in form.into_inner() { // iterate over the form data
         match value.is_empty() {
@@ -49,7 +50,7 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
 
     // creating let for an SMTP transport
     // i was trying to make relay(SMTP_SERVER) but it looks like that relay doesn't like this idk why
-    let mailer = SmtpTransport::relay(SMTP_HOST)
+    let mailer = SmtpTransport::relay(&SMTP_HOST)
         .unwrap()
         .credentials(credentials)
         .build();

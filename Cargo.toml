@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+actix-multipart = "0.6.0"
+actix-session = "0.5"
 actix-web = "4.3.1"
+dotenv = "0.15.0"
 env_logger = "0.10.0"
+futures = "0.3.28"
 futures-util = "0.3.28"
 lettre = "0.10.4"
 lettre_email = "0.9.4"
