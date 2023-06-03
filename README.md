@@ -1,5 +1,4 @@
 ![Build Status](https://img.shields.io/github/actions/workflow/status/jknoptrix/rust-basic-webapp/.github/workflows/rust.yml?style=for-the-badge)
-![Checks](https://img.shields.io/github/checks-status/jknoptrix/rust-basic-webapp/7ae15eb?style=for-the-badge)
 ![Test](https://img.shields.io/badge/test-passing-green?style=for-the-badge)
 # Rust Actix-Web Example
 
