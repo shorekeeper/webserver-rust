@@ -6,24 +6,44 @@
 This is a simple example of a Rust web application built using the Actix-Web framework. The application consists of two routes: an index page and a form submission page.
 ## Usage
 
-1. Start the server:
-   
+1. Setting up your SMTP and server credentials in `.env` file
+
+2. Start the server:
+   - `cargo build`
    - `cargo run`
-   
-2. Open a web browser and navigate to `http://localhost:8080` to view the index page.
-3. Click the "Submit" button to go to the form submission page.
-4. Enter some data into the form and click "Submit" to see the submitted data on the page.
+> NOTE: I recommend to use a `cargo-watch` for checking code changes. It will increase compiling time.
+
+3. Open a web browser and navigate to `<your domain>` to view the index page.
+
+4. Click the "Submit" button to go to the form submission page.
+
+5. Enter some data into the form and click "Submit" to see the submitted data on the page.
 
 ## Endpoints and code overview
 
-- The `main()` (EP: `/` )  function sets up the Actix-Web server and defines the two routes.
-- The `index()` (EP: `/templates/index` ) function handles requests to the root URL and renders the `index.tera` template using the Tera templating engine.
-- The `form()` (EP: `/templates/form` ) function handles form submissions and renders the `form.tera` template with the submitted data.
+- `main()` (EP: `/` )  function sets up the Actix-Web server and defines the two routes.
+- `index()` (EP: `/templates/index` ) function handles requests to the root URL and renders the `index.tera` template using the Tera templating engine.
+- `form()` (EP: `/templates/form` ) function handles form submissions and renders the `form.tera` template with the submitted data.
 
-# Form Processing
+# Form Process Module
 
-This Rust code processes a form submission using the Actix-web framework and sends an email using the Lettre crate.
+This module contains the `process_form` function which processes form data and sends an email using the SMTP protocol.
 
+## Quick code description
+
+The `process_form` function takes in a `web::Form` object containing a `HashMap` of form data. It then creates a new Tera context and inserts the name and context into it.
+
+The SMTP server credentials are defined as static variables using the `env::var` function to retrieve their values from the `.env` file. These variables are `SMTP_USER`, `SMTP_PASS`, and `SMTP_HOST`.
+
+The function then iterates over the form data and checks if any of the values are empty. If a value is empty, an error message is inserted into the context. If all values are non-empty, the function creates an email message using the `Message::builder` method and sends it using an SMTP transport.
+
+The part of the code where you can change the sent message is where the email message is created using the `Message::builder` method. The part of the code where the SMTP credentials are declared is where the static variables `SMTP_USER`, `SMTP_PASS`, and `SMTP_HOST` are defined:
+```rust
+let SMTP_USER = env::var("SMTP_USER").expect("SMTP_USER must be set"); // get the SMTP_USER from the .env file
+let SMTP_PASS = env::var("SMTP_PASS").expect("SMTP_PASS must be set"); // get the SMTP_PASS from the .env file
+let SMTP_HOST = env::var("SMTP_HOST").expect("SMTP_HOST must be set"); // get the SMTP_HOST from the .env file | WITHOUT SSL:// OR TLS://!!!
+```
+These values will be readen from .env config file from program parent directory or root project dir. 
 ## Dependencies
 
 This code uses the following dependencies:
@@ -45,10 +65,101 @@ SMTP_HOST=your_smtp_host
 4. The function iterates over the form data and checks if any value is empty. If a value is empty, an error message is inserted into the context and the iteration continues.
 5. If all values are present, the function creates an email message using the Lettre crate and sends it using the provided SMTP server credentials.
 
+# Logging Macros
+Project have logging macros for different log levels: `error`, `warn`, and `info`. These macros allow you to easily log messages with the current time and appropriate formatting for each log level.
+
+## Usage
+To use these macros, you need to declare the variable `now` using `let now = current_time();`. This is necessary because the macros require a reference to the current time to properly format the log messages.
+
+You also need to add the following crate imports: `use crate::log::{<log type>}; use crate::{<method>};`. These imports are necessary to use the logging functions and the `current_time` function.
+
+To log a message, use the appropriate macro for the desired log level. For example, to log an error message, use the `log_error!` macro like this: `log_error!(&now, "<message>");`. Note that you must pass a reference to `now` as the first argument to the macro.
+
+### Example:
+```rust
+use crate::log_info; // macro imports
+use crate::log::info; // method imports
+use crate::time::current_time; // time import
+
+fn main() {
+    let now = current_time();
+    log_info!(&now, "This is an informational message");
+}
+```
+> The `log_info!` macro is defined using the macro_rules! macro. It takes two arguments: a reference to the current time `($now:expr)` and a format string with any additional arguments `($($arg:tt)*)`. The macro expands to a call to the info function with the current time and the formatted message as arguments.
+
+The info function takes two arguments: 
+- A reference to the current time `(now: &str)`;
+- The message to log `(message: &str)`. 
+It uses the colored crate to format the log message with appropriate colors and styles for an informational message. The formatted message is then printed to standard output using the println! macro.
+
+## Time Module
+The `current_time` function is defined in a separate module because it uses the `chrono` crate to get the current time. This function cannot be defined in the same module as the macros because Rust.
+
+## Error handler
+The `error_handler` module contains all possible (for my opinion) web errors, but if you want to modify it, here's how can you do this:
+```rust
+let response = match error.as_response_error().error_response().status() {
+    StatusCode::<STATUS CODE> => {
+        HttpResponse::BadRequest().json(json!({
+             "error": "<error>",
+             "message": <error_message>
+        }))
+    },
+   // and some code below
+```
+> Note that all of the `StatusCode::` errors should be declared in `let response = ...` construction.
+
 ## Notes
 
 - This code contains some debug messages that can be removed or commented out.
 - The Tera template used to render the response is located in the `templates/form.tera` file.
+- I have some TODO here
+
+## TODO:
+
+Later I want to add an:
+- authorization system
+- the ability to upload files
+- cookies;
+But this requires a lot of work. For example, I already have a files upload:
+```rust
+pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
+    // iterate over the multipart fields and save each one to a file
+    while let Ok(Some(field)) = payload.try_next().await {
+        save_field(field).await?;
+    }
+
+    Ok(HttpResponse::Ok().into())
+}
+pub fn init<T>(app: App<T>) -> App<T>
+where
+    T: ServiceFactory<ServiceRequest, Config = (), Response = actix_web::dev::ServiceResponse, Error = actix_web::Error, InitError = ()>,
+{
+    app.route("/upload", web::post().to(upload))
+}
+```
+
+But for now it gives a bunch of errors that I’m too lazy to solve, and the problem is traits. I’m not strong in Rust and I’m still a beginner, so it’s a bit difficult for me. There is also an option to connect to the database and serialize data via JSON now:
+```rust
+async fn get_data(query: web::Query<Query>) -> HttpResponse {
+    // Retrieve data from database using the provided id
+    let data = get_data_from_database(query.id).await;
+
+    // Return data as a JSON response
+    HttpResponse::Ok().json(data)
+}
+async fn get_data_from_database(id: i32) -> serde_json::Value {
+    // Example data retrieval from database
+    json!({
+        "id": id,
+        "name": "Example Data",
+        "value": 42
+    })
+}
+```
+
+> I think I will definitely add this later, but not now.
 
 ## Credits
 
