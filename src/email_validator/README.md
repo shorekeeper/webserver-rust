@@ -8,7 +8,7 @@ This repository contains two validator modules: email_validator and input_valida
 
 ### Here's how can you use it:
 ```rust
-use email_validator::{EmailValidator, EmailRegexValidator};
+use crate::email_validator::{EmailValidator, EmailRegexValidator};
 
 let validator = EmailRegexValidator::new();
 let email = "example@example.com";

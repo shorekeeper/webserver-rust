@@ -7,6 +7,8 @@ This module provides a global form configuration and handler. It allows you to s
 To use this module, you need to create an instance of `FormConfigImpl`:
 
 ```rust
+use crate::form_config::{FormConfig, FormConfigImpl};
+// ..
 let mut form_config = FormConfigImpl::new();
 ```
 You can retrieve the form data using the corresponding getter methods:

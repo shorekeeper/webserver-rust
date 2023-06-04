@@ -6,7 +6,7 @@
 
 ### Here's how can you use it:
 ```rust
-use input_validator::{InputValidator, NonEmptyInputValidator};
+use crate::input_validator::{InputValidator, NonEmptyInputValidator};
 
 let validator = NonEmptyInputValidator;
 let input = "some input";
