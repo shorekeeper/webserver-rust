@@ -1,81 +1,77 @@
+use crate::input_validator::InputValidator;
+use crate::form_config::{FormConfig, FormConfigImpl};
+use crate::{log_info, log_warn, log_error};
+use crate::log::{info, error, warn};
+use crate::time::current_time;
+
 use actix_web::{web, HttpResponse};
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::authentication::Credentials;
-use tera::{Context, Tera};
-use std::env;
+use tera::{Tera};
 
 #[allow(non_snake_case)]
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
-     
-    let mut context = Context::new(); // create a new Tera context
-    context.insert("name", "User");
-    context.insert("context", "Rust Form");
+    let now = current_time();
+    let mut config = FormConfigImpl::new();
 
-    // defining SMTP server credentials as static variables
-    let SMTP_USER = env::var("SMTP_USER").expect("SMTP_USER must be set"); // get the SMTP_USER from the .env file
-    let SMTP_PASS = env::var("SMTP_PASS").expect("SMTP_PASS must be set"); // get the SMTP_PASS from the .env file
-    let SMTP_HOST = env::var("SMTP_HOST").expect("SMTP_HOST must be set"); // get the SMTP_HOST from the .env file | WITHOUT SSL:// OR TLS://!!!
-
-    let mut email = String::new();
-    let mut name = String::new();
-    let mut message_body = String::new();
-    
-    for (key, value) in form.into_inner() { // iterate over the form data
-        match value.is_empty() {
-            true => {
-                context.insert("error", &format!("{} cannot be empty", key));
-                match (name.is_empty(), email.is_empty(), message_body.is_empty()) {
+    for (key, value) in form.into_inner() {
+        match config.input_validator().is_valid(&value) {
+            false => {
+                config.context().insert("error", &format!("{} cannot be empty", key));
+                match (config.name().is_empty(), config.email().is_empty(), config.message_body().is_empty()) {
                     (true, true, true) => {
-                        context.insert("error", "smtp is not magic, type smth");
-                        println!("User is bruh");
+                        //if !*config.message_printed() {
+                            config.context().insert("error", "smtp is not magic, type smth");
+                            log_error!(&now, "User didn't entered anything for: {}", key);
+                            // *config.message_printed() = true;
+                        //}
                     },
-                    _ => println!("User didn't entered {}", key),
+                    _ => log_warn!(&now, "User didn't entered {}", key),
                 }
                 continue;
             }
-            false => {
-                context.insert(key.as_str(), &value);
-                println!("User entered {} for {}", value, key);
+            true => {
+                config.context().insert(key.as_str(), &value);
+                log_info!(&now, "User entered {} for {}", value, key);
                 match key.as_str() {
-                    "email" => email = value,
-                    "name" => name = value,
-                    "message" => message_body = value,
+                    "email" => config.set_email(value),
+                    "name" => config.set_name(value),
+                    "message" => config.set_message_body(value),
                     _ => (),
                 }
             }
         }
     }
-    // creating let with SMTP credentials
-    let credentials = Credentials::new(SMTP_USER.to_string(), SMTP_PASS.to_string());
+    
 
-    // creating let for an SMTP transport
-    // i was trying to make relay(SMTP_SERVER) but it looks like that relay doesn't like this idk why
-    let mailer = SmtpTransport::relay(&SMTP_HOST)
+    let credentials = Credentials::new(config.smtp_user(), config.smtp_pass());
+    let mailer = SmtpTransport::relay(&config.smtp_host())
         .unwrap()
         .credentials(credentials)
         .build();
 
-    match (email.is_empty() || !email.contains('@'), SMTP_USER.is_empty() || !SMTP_USER.contains('@')) { // validate the email address and SMTP username
-        (true, _) => context.insert("error", "Invalid email address"),
-        (_, true) => context.insert("error", "Invalid SMTP username"),
-        (false, false) => {
-            let message = Message::builder() // create an email message
-                .from(SMTP_USER.parse().unwrap())
-                .to(email.parse().unwrap())
+    match (config.email_validator().is_valid(&config.email()), config.email_validator().is_valid(&config.smtp_user())) {
+        (false, _) => config.context().insert("error", "Invalid email address"),
+        (_, false) => config.context().insert("error", "Invalid SMTP username"),
+        (true, true) => {
+            let message = Message::builder()
+                .from(config.smtp_user().parse().unwrap())
+                .to(config.email().parse().unwrap())
                 .subject("Form Submission")
                 .body(format!(
                     "Thank you for your submission, {}!\n\nYour message:\n{}",
-                    name, message_body
+                    config.name(), config.message_body()
                 ))
                 .unwrap();
-
             // send the email message
             match mailer.send(&message) {
-                Ok(_) => println!("Email sended: {}", email),
-                Err(e) => eprintln!("Error sending email: {:?}", e),
+                Ok(_) => log_info!(&now, "Email sended: {}", config.email()),
+                Err(e) => log_error!(&now, "Error sending email: {:?}", e),
             }
         }
     }
-    let body = Tera::one_off(include_str!("templates/form.tera"), &context, false).unwrap(); // render the template with the context
-    HttpResponse::Ok().body(body) // return the rendered template as the response body
+        
+
+    let body = Tera::one_off(include_str!("templates/form.tera"), &config.context(), false).unwrap();
+    HttpResponse::Ok().body(body)
 }

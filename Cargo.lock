@@ -1970,6 +1970,7 @@ dependencies = [
  "futures-util",
  "lettre 0.10.4",
  "lettre_email",
+ "regex",
  "serde_json",
  "tera",
 ]

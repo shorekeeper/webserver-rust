@@ -1,0 +1,90 @@
+use crate::email_validator::{EmailRegexValidator, EmailValidator};
+use crate::input_validator::{NonEmptyInputValidator, InputValidator};
+use crate::form_config::{FormConfig, FormConfigImpl};
+use crate::{log_info, log_warn, log_error};
+use crate::log::{info, error, warn};
+
+use actix_web::{web, HttpResponse};
+use lettre::{Message, SmtpTransport, Transport};
+use lettre::transport::smtp::authentication::Credentials;
+use tera::{Context, Tera};
+use std::env;
+
+#[allow(non_snake_case)]
+pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
+
+    let SMTP_USER = env::var("SMTP_USER").expect("SMTP_USER must be set");
+    let SMTP_PASS = env::var("SMTP_PASS").expect("SMTP_PASS must be set");
+    let SMTP_HOST = env::var("SMTP_HOST").expect("SMTP_HOST must be set");
+    let email_validator = EmailRegexValidator::new();
+    let input_validator = NonEmptyInputValidator;
+    let mut message_printed = false;
+    let mut email = String::new();
+    let mut name = String::new();
+    let mut message_body = String::new();
+    let mut context = Context::new();
+    context.insert("name", "User");
+    context.insert("context", "Rust Form");
+    let now = current_time();
+
+    for (key, value) in form.into_inner() {
+        match input_validator.is_valid(&value) {
+            false => {
+                context.insert("error", &format!("{} cannot be empty", key));
+                match (name.is_empty(), email.is_empty(), message_body.is_empty()) {
+                    (true, true, true) => {
+                        if !message_printed { // im so sorry but i have to do that lol
+                            context.insert("error", "smtp is not magic, type smth");
+                            println!("User didn't entered anything");
+                            message_printed = true;
+                        }
+                    },
+                    _ => println!("User didn't entered {}", key),
+                }
+                continue;
+            }
+            true => {
+                context.insert(key.as_str(), &value);
+                println!("User entered {} for {}", value, key);
+                match key.as_str() {
+                    "email" => email = value,
+                    "name" => name = value,
+                    "message" => message_body = value,
+                    _ => (),
+                }
+            }
+        }
+    }
+    
+
+    let credentials = Credentials::new(SMTP_USER.to_string(), SMTP_PASS.to_string());
+    let mailer = SmtpTransport::relay(&SMTP_HOST)
+        .unwrap()
+        .credentials(credentials)
+        .build();
+
+    match (email_validator.is_valid(&email), email_validator.is_valid(&SMTP_USER)) {
+        (false, _) => context.insert("error", "Invalid email address"),
+        (_, false) => context.insert("error", "Invalid SMTP username"),
+        (true, true) => {
+            let message = Message::builder()
+                .from(SMTP_USER.parse().unwrap())
+                .to(email.parse().unwrap())
+                .subject("Form Submission")
+                .body(format!(
+                    "Thank you for your submission, {}!\n\nYour message:\n{}",
+                    name, message_body
+                ))
+                .unwrap();
+
+            // send the email message
+            match mailer.send(&message) {
+                Ok(_) => println!("Email sended: {}", email),
+                Err(e) => eprintln!("Error sending email: {:?}", e),
+            }
+        }
+    }
+
+    let body = Tera::one_off(include_str!("templates/form.tera"), &context, false).unwrap();
+    HttpResponse::Ok().body(body)
+}
