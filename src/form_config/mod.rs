@@ -4,6 +4,7 @@ use std::env;
 use tera::Context;
 
 pub trait FormConfig {
+    // define methods for the FormConfig trait
     fn set_email(&mut self, email: String);
     fn set_name(&mut self, name: String);
     fn set_message_body(&mut self, message_body: String);
@@ -16,10 +17,11 @@ pub trait FormConfig {
     fn name(&self) -> String;
     fn message_body(&self) -> String;
     fn context(&mut self) -> &mut Context;
-    fn email_validator(&self) -> &dyn EmailValidator;
+    fn email_validator(&self) -> &dyn EmailValidator; // it SHOULD be declared as dyn 
 }
 
 pub struct FormConfigImpl {
+    // define fields for the FormConfigImpl struct
     smtp_user: String,
     smtp_pass: String,
     smtp_host: String,
@@ -34,14 +36,15 @@ pub struct FormConfigImpl {
 
 impl FormConfigImpl {
     pub fn new() -> Self {
-        let smtp_user = env::var("SMTP_USER").expect("SMTP_USER must be set");
-        let smtp_pass = env::var("SMTP_PASS").expect("SMTP_PASS must be set");
-        let smtp_host = env::var("SMTP_HOST").expect("SMTP_HOST must be set");
-        let email_validator = EmailRegexValidator::new();
-        let input_validator = NonEmptyInputValidator;
-        let mut context = Context::new();
-        context.insert("name", "User");
-        context.insert("context", "Rust Form");
+        // define a new method for creating a new instance of FormConfigImpl
+        let smtp_user = env::var("SMTP_USER").expect("SMTP_USER must be set"); // get SMTP_USER from environment variable
+        let smtp_pass = env::var("SMTP_PASS").expect("SMTP_PASS must be set"); // get SMTP_PASS from environment variable
+        let smtp_host = env::var("SMTP_HOST").expect("SMTP_HOST must be set"); // get SMTP_HOST from environment variable
+        let email_validator = EmailRegexValidator::new(); // create a new instance of EmailRegexValidator
+        let input_validator = NonEmptyInputValidator; // create a new instance of NonEmptyInputValidator
+        let mut context = Context::new(); // create a new instance of Context
+        context.insert("name", "User"); // insert name into context
+        context.insert("context", "Rust Form"); // insert context into context
 
         Self {
             smtp_user,
@@ -59,6 +62,7 @@ impl FormConfigImpl {
 }
 
 impl FormConfig for FormConfigImpl {
+    // implement the FormConfig trait for the FormConfigImpl struct
     fn smtp_user(&self) -> String {
         self.smtp_user.clone()
     }
@@ -100,14 +104,14 @@ impl FormConfig for FormConfigImpl {
     }
 
     fn set_email(&mut self, email: String) {
-        self.email = email;
+        self.email = email; // set the email field to the given value
     }
 
     fn set_name(&mut self, name: String) {
-        self.name = name;
+        self.name = name; // set the name field to the given value
     }
 
     fn set_message_body(&mut self, message_body: String) {
-        self.message_body = message_body;
+        self.message_body = message_body; // set the msgbody to the given value
     }
 }

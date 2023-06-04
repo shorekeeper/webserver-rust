@@ -32,11 +32,13 @@ pub async fn create_server(server_ip: &str) -> std::io::Result<()> {
     })
     
     .bind(server_ip) {
+        // for ok
         Ok(server) => { // if ok
             log_warn!(&now, "📢 \x1B[1m\x1b[32mListening on: \x1b[31mhttp://{}\x1b[0m", server_ip); // print the server IP address after the server starts
             log_info!(&now, "✅ \x1B[1m\x1B[4mOk bro now i'm gonna run ur site\x1b[0m");
             server
         }
+        // for errors
         Err(e) => { // if NOT ok
             log_error!(&now, "!!! FAILED TO BIND A SERVER !!!\n\x1b[33mIP: \x1b[31m'{}'\n\x1b[33m  |\n\x1b[33m  v\n\x1b[33mERROR_CODE: \x1b[31m{}\x1b[0m", server_ip, e);
             thread::sleep(Duration::from_secs(10)); 
