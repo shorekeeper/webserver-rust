@@ -182,12 +182,12 @@ context.insert("key", "value");
 
 ## Validation
 The module provides two validators: an `email validator` and a non-empty `input validator`. You can access these validators using the `email_validator` and `input_validator` methods:
-```
+```rust
 let email_validator = form_config.email_validator();
 let input_validator = form_config.input_validator();
 ```
 You can also then use these validators to validate form data:
-```
+```rust
 let is_email_valid = email_validator.is_valid(&form_config.email());
 let is_name_valid = input_validator.is_valid(&form_config.name());
 ```
