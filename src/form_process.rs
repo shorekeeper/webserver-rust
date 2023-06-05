@@ -1,17 +1,14 @@
 use crate::input_validator::InputValidator;
 use crate::form_config::{FormConfig, FormConfigImpl};
-use crate::{log_info, log_warn, log_error}; // you should use all of this imports if u want to use log_<type>! macros
-use crate::log::{info, error, warn}; //
-use crate::time::current_time; //
 
 use actix_web::{web, HttpResponse};
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::authentication::Credentials; 
+use logger_rust::*;
 use tera::{Tera};
 
 #[allow(non_snake_case)]
 pub async fn process_form(form: web::Form<std::collections::HashMap<String, String>>) -> HttpResponse {
-    let now = current_time(); // get current time
     let mut config = FormConfigImpl::new(); // create a new instance of FormConfigImpl
 
     for (key, value) in form.into_inner() { // iterate over form data
@@ -22,15 +19,15 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
                     (true, true, true) => {
                         // i could definitely use if statements here but i like match much (lol) more
                         config.context().insert("error", "smtp is not magic, type smth");
-                        log_error!(&now, "User didn't entered anything for: {}", key);
+                        log_error!("User didn't entered anything for: {}", key);
                     },
-                    _ => log_warn!(&now, "User didn't entered {}", key),
+                    _ => log_warn!("User didn't entered {}", key),
                 }
                 continue;
             }
             true => {
                 config.context().insert(key.as_str(), &value);
-                log_info!(&now, "User entered {} for {}", value, key);
+                log_info!("User entered {} for {}", value, key);
                 match key.as_str() { 
                     "email" => config.set_email(value), // set email in config
                     "name" => config.set_name(value), // set name in config
@@ -61,8 +58,8 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
                 ))
                 .unwrap(); // create new Message instance with smtp_user and email from config and formatted body text
             match mailer.send(&message) { 
-                Ok(_) => log_info!(&now, "Email sended: {}", config.email()), 
-                Err(e) => log_error!(&now, "Error sending email: {:?}", e),
+                Ok(_) => log_info!("Email sended: {}", config.email()), 
+                Err(e) => log_error!("Error sending email: {:?}", e),
             } 
         }
     }
