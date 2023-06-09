@@ -7,9 +7,12 @@ mod check_config;
 mod form_config;
 mod init;
 // mod uploads;
+
+use crate::init::{create_server, init_logger};
+
 use dotenv::dotenv;
 use std::{env, str::FromStr, net::SocketAddr};
-use crate::init::{create_server, init_logger};
+
 use logger_rust::*;
 
 #[actix_web::main]

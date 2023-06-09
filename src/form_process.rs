@@ -20,14 +20,20 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
                         // i could definitely use if statements here but i like match much (lol) more
                         config.context().insert("error", "smtp is not magic, type smth");
                         log_error!("User didn't entered anything for: {}", key);
+                        log_trace!(key, value);
                     },
-                    _ => log_warn!("User didn't entered {}", key),
+                    _ => {
+                        log_warn!("User didn't entered {}", key);
+                        log_trace!(key, value);
+                    },
                 }
                 continue;
             }
             true => {
+
                 config.context().insert(key.as_str(), &value);
                 log_info!("User entered {} for {}", value, key);
+                log_trace!(key, value);
                 match key.as_str() { 
                     "email" => config.set_email(value), // set email in config
                     "name" => config.set_name(value), // set name in config
@@ -57,6 +63,7 @@ pub async fn process_form(form: web::Form<std::collections::HashMap<String, Stri
                     config.name(), config.message_body()
                 ))
                 .unwrap(); // create new Message instance with smtp_user and email from config and formatted body text
+            log_trace!(config.name(), config.message_body());
             match mailer.send(&message) { 
                 Ok(_) => log_info!("Email sended: {}", config.email()), 
                 Err(e) => log_error!("Error sending email: {:?}", e),
