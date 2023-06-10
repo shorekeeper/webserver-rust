@@ -15,7 +15,7 @@ futures = "0.3.28"
 futures-util = "0.3.28"
 lettre = "0.10.4"
 lettre_email = "0.9.4"
-logger-rust = { path = "F:/logger-rust" }
+logger-rust = "0.2.12"
 regex = "1.8.3"
 serde_json = "1.0.96"
 syn = "2.0.18"
